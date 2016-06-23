@@ -1,0 +1,35 @@
+plugin_register tokenizers/white
+[[0,0.0,0.0],true]
+table_create white_words TABLE_PAT_KEY ShortText
+[[0,0.0,0.0],true]
+load --table white_words
+[
+{"_key": "装置"},
+{"_key": "情報"}
+]
+[[0,0.0,0.0],2]
+tokenize TokenWhite "情報処理装置は装置である"
+[
+  [
+    0,
+    0.0,
+    0.0
+  ],
+  [
+    {
+      "value": "情報",
+      "position": 0,
+      "force_prefix": false
+    },
+    {
+      "value": "装置",
+      "position": 1,
+      "force_prefix": false
+    },
+    {
+      "value": "装置",
+      "position": 2,
+      "force_prefix": false
+    }
+  ]
+]

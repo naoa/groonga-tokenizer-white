@@ -1,0 +1,49 @@
+plugin_register tokenizers/white
+[[0,0.0,0.0],true]
+table_create white_words TABLE_PAT_KEY ShortText   --default_tokenizer TokenWhite   --normalizer NormalizerAuto
+[[0,0.0,0.0],true]
+load --table white_words
+[
+{"_key": "装置"}
+]
+[[0,0.0,0.0],1]
+table_create Memos TABLE_NO_KEY
+[[0,0.0,0.0],true]
+column_create Memos content COLUMN_SCALAR ShortText
+[[0,0.0,0.0],true]
+load --table Memos
+[
+{"content": "情報処理装置の装置"}
+]
+[[0,0.0,0.0],1]
+column_create white_words memos_content COLUMN_INDEX|WITH_POSITION Memos content
+[[0,0.0,0.0],true]
+select Memos   --match_columns white_words.memos_content   --query "装置" --output_columns content,_score
+[
+  [
+    0,
+    0.0,
+    0.0
+  ],
+  [
+    [
+      [
+        1
+      ],
+      [
+        [
+          "content",
+          "ShortText"
+        ],
+        [
+          "_score",
+          "Int32"
+        ]
+      ],
+      [
+        "情報処理装置の装置",
+        2
+      ]
+    ]
+  ]
+]
