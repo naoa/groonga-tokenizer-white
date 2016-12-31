@@ -103,7 +103,7 @@ white_init(grn_ctx *ctx, int nargs, grn_obj **args, grn_user_data *user_data)
 
 
   if (!(tokenizer->hits =
-      GRN_PLUGIN_MALLOC(ctx, sizeof(grn_pat_scan_hit) * MAX_N_HITS))) {
+      GRN_PLUGIN_CALLOC(ctx, sizeof(grn_pat_scan_hit) * MAX_N_HITS))) {
     GRN_PLUGIN_ERROR(ctx,GRN_NO_MEMORY_AVAILABLE,
                      "[tokenizer][white] "
                      "failed to alocate memory for grn_pat_scan_hit");
@@ -129,6 +129,7 @@ white_next(grn_ctx *ctx, GNUC_UNUSED int nargs, GNUC_UNUSED grn_obj **args,
 {
   white_tokenizer *tokenizer = user_data->ptr;
   grn_tokenizer_status status;
+  grn_id token_id = GRN_ID_NIL;
   const char *token_top = tokenizer->start;
   const char *token_tail = tokenizer->end;
   unsigned int scan_rest_length = tokenizer->end - tokenizer->scan_rest;
@@ -146,6 +147,7 @@ white_next(grn_ctx *ctx, GNUC_UNUSED int nargs, GNUC_UNUSED grn_obj **args,
   }
   if (tokenizer->nhits > 0 &&
       tokenizer->current_hit < tokenizer->nhits) {
+    token_id = tokenizer->hits[tokenizer->current_hit].id;
     token_top = tokenizer->scan_start + tokenizer->hits[tokenizer->current_hit].offset;
     token_tail = token_top + tokenizer->hits[tokenizer->current_hit].length;
     tokenizer->current_hit++;
@@ -160,11 +162,24 @@ white_next(grn_ctx *ctx, GNUC_UNUSED int nargs, GNUC_UNUSED grn_obj **args,
     status = GRN_TOKEN_CONTINUE;
   }
 
-  grn_tokenizer_token_push(ctx,
-                           &(tokenizer->token),
-                           token_top,
-                           token_tail - token_top,
-                           status);
+  if (token_id) {
+    char key_name[GRN_TABLE_MAX_KEY_SIZE];
+    int key_len;
+    key_len = grn_table_get_key(ctx, tokenizer->white_table, token_id,
+                                key_name, GRN_TABLE_MAX_KEY_SIZE);
+    grn_tokenizer_token_push(ctx,
+                             &(tokenizer->token),
+                             key_name,
+                             key_len,
+                             status);
+  } else {
+    status |= GRN_TOKEN_SKIP;
+    grn_tokenizer_token_push(ctx,
+                             &(tokenizer->token),
+                             token_top,
+                             token_tail - token_top,
+                             status);
+  }
 
   return NULL;
 }
