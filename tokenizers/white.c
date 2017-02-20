@@ -30,6 +30,7 @@
 #define MAX_N_HITS 1024
 
 const char *white_table_name = "white_words";
+uint32_t white_table_name_size = 11;
 
 typedef struct {
   const char *start;
@@ -68,22 +69,9 @@ white_init(grn_ctx *ctx, int nargs, grn_obj **args, grn_user_data *user_data)
     return NULL;
   }
 
-  {
-    const char *config_table_name;
-    uint32_t config_table_name_size;
-    grn_config_get(ctx,
-                   "tokenizer-white.table", -1,
-                   &config_table_name, &config_table_name_size);
-    if (config_table_name) {
-      tokenizer->white_table = grn_ctx_get(ctx,
-                                           config_table_name,
-                                           config_table_name_size);
-    } else {
-      tokenizer->white_table = grn_ctx_get(ctx,
-                                           white_table_name,
-                                           strlen(white_table_name));
-    }
-  }
+  tokenizer->white_table = grn_ctx_get(ctx,
+                                       white_table_name,
+                                       white_table_name_size);
   if (!tokenizer->white_table) {
     GRN_PLUGIN_ERROR(ctx, GRN_NO_MEMORY_AVAILABLE,
                      "[tokenizer][white] "
@@ -227,6 +215,17 @@ GRN_PLUGIN_INIT(grn_ctx *ctx)
   grn_getenv("GRN_WHITE_TABLE_NAME", white_table_name_env, GRN_ENV_BUFFER_SIZE);
   if (white_table_name_env[0]) {
     white_table_name = white_table_name_env;
+    white_table_name_size = strlen(white_table_name);
+  } else {
+    const char *config_table_name;
+    uint32_t config_table_name_size;
+    grn_config_get(ctx,
+                   "tokenizer-white.table", -1,
+                   &config_table_name, &config_table_name_size);
+    if (config_table_name) {
+      white_table_name = config_table_name;
+      white_table_name_size = config_table_name_size;
+    }
   }
   return ctx->rc;
 }

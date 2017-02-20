@@ -1,6 +1,6 @@
-plugin_register tokenizers/white
-
 config_set tokenizer-white.table white_terms
+
+plugin_register tokenizers/white
 
 table_create white_terms TABLE_PAT_KEY ShortText
 load --table white_terms
