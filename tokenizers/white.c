@@ -68,9 +68,22 @@ white_init(grn_ctx *ctx, int nargs, grn_obj **args, grn_user_data *user_data)
     return NULL;
   }
 
-  tokenizer->white_table = grn_ctx_get(ctx,
-                                       white_table_name,
-                                       strlen(white_table_name));
+  {
+    const char *config_table_name;
+    uint32_t config_table_name_size;
+    grn_config_get(ctx,
+                   "tokenizer-white.table", -1,
+                   &config_table_name, &config_table_name_size);
+    if (config_table_name) {
+      tokenizer->white_table = grn_ctx_get(ctx,
+                                           config_table_name,
+                                           config_table_name_size);
+    } else {
+      tokenizer->white_table = grn_ctx_get(ctx,
+                                           white_table_name,
+                                           strlen(white_table_name));
+    }
+  }
   if (!tokenizer->white_table) {
     GRN_PLUGIN_ERROR(ctx, GRN_NO_MEMORY_AVAILABLE,
                      "[tokenizer][white] "

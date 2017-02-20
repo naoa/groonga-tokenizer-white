@@ -4,7 +4,12 @@
 
 ``TABLE_PAT_KEY``型の``white_words``テーブルに登録されたキーのみでトークナイズするトークナイザー。
 
-環境変数``GRN_WHITE_TABLE_NAME``でテーブル名の変更が可能。
+環境変数``GRN_WHITE_TABLE_NAME``でテーブル名の変更が可能。   
+もしくは``tokenizer-white.table``のコンフィグでテーブル名の変更が可能。
+
+```
+config_set tokenizer-white.table white_terms
+```
 
 ```
 plugin_register tokenizers/white

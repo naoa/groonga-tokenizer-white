@@ -1,0 +1,11 @@
+plugin_register tokenizers/white
+
+config_set tokenizer-white.table white_terms
+
+table_create white_terms TABLE_PAT_KEY ShortText
+load --table white_terms
+[
+{"_key": "処理"}
+]
+
+tokenize TokenWhite "情報処理装置"

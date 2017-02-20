@@ -1,0 +1,13 @@
+plugin_register tokenizers/white
+[[0,0.0,0.0],true]
+config_set tokenizer-white.table white_terms
+[[0,0.0,0.0],true]
+table_create white_terms TABLE_PAT_KEY ShortText
+[[0,0.0,0.0],true]
+load --table white_terms
+[
+{"_key": "処理"}
+]
+[[0,0.0,0.0],1]
+tokenize TokenWhite "情報処理装置"
+[[0,0.0,0.0],[{"value":"処理","position":0,"force_prefix":false}]]
